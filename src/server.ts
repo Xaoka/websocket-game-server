@@ -1,6 +1,6 @@
 const WebSocketServer = require('ws');
 
-const wss = new WebSocketServer.Server({ port: 8090 });
+const wss = new WebSocketServer.Server({ port: process.env.PORT || 8090 });
 
 console.log(`Among Us Isolation Server - started`)
 const matches = [];
