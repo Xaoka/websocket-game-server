@@ -1,0 +1,17 @@
+{
+  "name": "aui-server",
+  "version": "0.1.0",
+  "description": "Among Us Isolation Server",
+  "main": "src/server.ts",
+  "dependencies": {
+    "@types/node": "^15.12.4",
+    "ws": "^7.4.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
