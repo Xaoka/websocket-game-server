@@ -1,7 +1,7 @@
 {
   "name": "aui-server",
   "version": "0.1.0",
-  "description": "Among Us Isolation Server",
+  "description": "Among Us Isolation Server with heroku",
   "main": "src/server.ts",
   "dependencies": {
     "@types/node": "^15.12.4",
