@@ -25,6 +25,7 @@ const serverState = {};
 wss.on('connection', function connection(ws) {
   ws.on('error', function onError(e) {
     console.log(`Client WebsocketError: ${e}`);
+    ws.close();
   })
   ws.on('close', function onEnd() {
     console.log("Client closed websocket, cleaning up.")
@@ -47,10 +48,13 @@ wss.on('connection', function connection(ws) {
         }
         console.dir(messageData);
         console.log(`Type: ${messageData.type}, data: ${JSON.stringify(messageData.data)}`);
+        const id = players.map((player) => player.ws).indexOf(ws);
         if (messageData.type == "handshake")
         {
             // console.log(`Sending ${players.length}`)
 
+            console.log(`New Player: ${players.length} (${ws})`);
+            players.push({ ws, id: players.length, ready: false, data: messageData.data });
             // ws.send(players.length);
             for (let i = 0; i < players.length; i++)
             {
@@ -61,8 +65,6 @@ wss.on('connection', function connection(ws) {
               // Tell the new player about all existing players in the lobby
               sendMessage(ws, { type: "join", id: i, data: player.data });
             }
-            console.log(`New Player: ${players.length} (${ws})`);
-            players.push({ ws, id: players.length, ready: false, data: messageData.data });
 
             for (const state of Object.entries(serverState))
             {
@@ -115,23 +117,26 @@ wss.on('connection', function connection(ws) {
         }
         else if (messageData.type == "move")
         {
-          const id = players.map((player) => player.ws).indexOf(ws);
           const d = messageData.data;
           broadcastMessage({ type: "move", id, x: d.x, y: d.y, z: d.z, rotation: d.rotation }, ws, true);
           // Store server data?
         }
         else if (messageData.type == "special_key_press")
         {
-          const id = players.map((player) => player.ws).indexOf(ws);
           console.log(`Player ${id} sent key ${messageData.data.key}`);
           broadcastMessage({ type: "special_key_press", id, special_key: messageData.data.key }, ws, true);
         }
         else if (messageData.type == "player_state")
         {
-          const id = players.map((player) => player.ws).indexOf(ws);
-          // console.log(`Player ${id} sent key ${messageData.data.key}`);
           broadcastMessage({ type: "player_state", id, state: messageData.data.state, value: messageData.data.value }, ws, true);
-          // serverState[messageData.data.target] = true;
+        }
+        else if (messageData.type == "player_interaction")
+        {
+          broadcastMessage({ type: "player_interaction", id, target: messageData.data.target, action: messageData.data.action }, ws, true);
+        }
+        else if (messageData.type == "death")
+        {
+          broadcastMessage({ type: "death", id }, ws, true);
         }
     }
     catch (err)
